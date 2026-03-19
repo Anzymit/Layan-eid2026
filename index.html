@@ -9,7 +9,9 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
-        body { margin: 0; overflow: hidden; background: black; font-family: 'Tajawal', sans-serif; }
+        body { margin: 0; overflow: hidden; background: black; font-family: 'Tajawal', sans-serif; cursor: pointer; }
+        
+        /* -- الصفحة الأولى (القلب) -- */
         #page1 { position: absolute; width: 100%; height: 100%; z-index: 2; transition: opacity 1s; }
         #page1 svg { position: absolute; width: 0; height: 0; }
         #center-text {
@@ -19,56 +21,86 @@
         }
         #tap-msg {
             position: absolute; bottom: 100px; width: 100%; text-align: center;
-            color: rgba(255, 255, 255, 0.7); font-size: 18px; animation: pulse 1.5s infinite; z-index: 5;
-            background: rgba(0,0,0,0.5); padding: 10px; border-radius: 20px;
+            color: rgba(255, 255, 255, 0.5); font-size: 14px; animation: pulse 2s infinite; pointer-events: none; z-index: 5;
         }
-        @keyframes pulse { 0% { opacity: 0.4; transform: scale(1); } 50% { opacity: 1; transform: scale(1.05); } 100% { opacity: 0.4; transform: scale(1); } }
+        @keyframes pulse { 0% { opacity: 0.3; } 50% { opacity: 0.8; } 100% { opacity: 0.3; } }
         .next-btn {
             position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
             padding: 10px 25px; background: transparent; color: white; border: 2px solid white;
-            border-radius: 20px; font-size: 18px; z-index: 10; cursor: pointer; display: none;
+            border-radius: 20px; font-size: 18px; z-index: 10; transition: 0.3s; cursor: pointer;
         }
+        .next-btn:hover { background: white; color: black; }
+
+        /* -- الصفحة الثانية (النص والرسالة) -- */
         #page2 { position: absolute; width: 100%; height: 100%; z-index: 1; display: none; opacity: 0; transition: opacity 1s; }
         #ui { position: absolute; width: 100%; height: 100%; z-index: 1; }
         #ui .love { position: absolute; top: 50%; left: 50%; margin: -225px 0 0 -225px; --i: 1; }
-        #ui .love_word { color: #ea80b0; font-size: 1.4rem; transform: translateY(-100%) rotateZ(-30deg); text-shadow: 0 0 10px #fff; white-space: nowrap; }
+        #ui .love_word { color: #ea80b0; font-size: 1.4rem; transform: translateY(-100%) rotateZ(-30deg); text-shadow: 0 0 10px #fff; letter-spacing: 2px; white-space: nowrap; }
         #ui .love_horizontal { animation: horizontal 10000ms infinite alternate ease-in-out; animation-delay: calc(var(--i) * -300ms); }
         #ui .love_vertical { animation: vertical 20000ms infinite linear; animation-delay: calc(var(--i) * -300ms); }
+
         @keyframes horizontal { from { transform: translateX(0px); } to { transform: translateX(450px); } }
-        @keyframes vertical { 0% { transform: translateY(180px); } 100% { transform: translateY(180px); } } /* simplified for performance */
+        @keyframes vertical {
+            0% { transform: translateY(180px); } 10% { transform: translateY(45px); } 15% { transform: translateY(4.5px); }
+            18% { transform: translateY(0px); } 20% { transform: translateY(4.5px); } 22% { transform: translateY(34.61538px); }
+            24% { transform: translateY(64.28571px); } 25% { transform: translateY(112.5px); } 26% { transform: translateY(64.28571px); }
+            28% { transform: translateY(34.61538px); } 30% { transform: translateY(4.5px); } 32% { transform: translateY(0px); }
+            35% { transform: translateY(4.5px); } 40% { transform: translateY(45px); } 50% { transform: translateY(180px); }
+            71% { transform: translateY(428.57143px); } 72.5% { transform: translateY(441.17647px); } 75% { transform: translateY(450px); }
+            77.5% { transform: translateY(441.17647px); } 79% { transform: translateY(428.57143px); } 100% { transform: translateY(180px); }
+        }
+
         #message-box {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px;
-            max-height: 80vh; overflow-y: auto; background: rgba(20, 0, 10, 0.85); border: 1px solid rgba(234, 128, 176, 0.4);
-            border-radius: 20px; padding: 30px 20px; color: #fcfafb; backdrop-filter: blur(10px); z-index: 10; text-align: center;
+            max-height: 80vh; overflow-y: auto; background: rgba(20, 0, 10, 0.75); border: 1px solid rgba(234, 128, 176, 0.4);
+            border-radius: 20px; padding: 30px 20px; box-shadow: 0 0 30px rgba(234, 128, 176, 0.2); z-index: 10;
+            text-align: center; color: #fcfafb; backdrop-filter: blur(5px);
         }
-        .poem, .classic-poem { color: #ea80b0; font-weight: bold; line-height: 1.8; }
-        .prose { font-size: 1.1rem; line-height: 1.7; margin: 20px 0; text-align: center; }
+        #message-box::-webkit-scrollbar { width: 6px; }
+        #message-box::-webkit-scrollbar-thumb { background: #ea80b0; border-radius: 10px; }
+        .poem { color: #ea80b0; font-weight: bold; font-size: 1.2rem; line-height: 1.8; margin-bottom: 20px; text-shadow: 0 0 10px rgba(234, 128, 176, 0.5); }
+        .prose { font-size: 1.1rem; line-height: 1.7; margin-bottom: 25px; text-align: justify; text-align-last: center; }
+        .classic-poem { color: #ea80b0; font-size: 1.15rem; line-height: 1.9; font-weight: bold; }
+        .classic-poem span { display: block; margin-bottom: 10px; }
     </style>
 </head>
-<body onclick="forceStart()">
+<body>
 
-    <audio id="bg-music" preload="auto" loop>
-        <source src="song.mp3" type="audio/mpeg">
+    <audio id="bg-music" loop>
+        <source src="https://files.catbox.moe/cyrion.mp3" type="audio/mpeg">
     </audio>
 
     <div id="page1">
-        <svg viewBox="0 0 600 552"><path id="heart-path" d="M300,520 C-180,200 150,-120 300,130 C450,-120 780,200 300,520 Z" fill="none"/></svg>
+        <svg viewBox="0 0 600 552">
+            <path d="M300,520 C-180,200 150,-120 300,130 C450,-120 780,200 300,520 Z" fill="none" stroke="none" />
+        </svg>
         <div id="center-text">كل عام وانتي بخير</div>
-        <div id="tap-msg">المسي الشاشة لسماع الموسيقى 🎵</div>
-        <button id="nbtn" class="next-btn" onclick="goToPage2(event)">الصفحة التالية 🤍</button>
+        <div id="tap-msg">اضغط على الشاشة</div>
+        <button class="next-btn" onclick="goToPage2()">الصفحة التالية 🤍</button>
     </div>
 
     <div id="page2">
         <div id="ui"></div>
         <div id="message-box">
-            <div class="poem">ياللي سكنت القلب والدار دارك<br>ماني بحول العيد لو عايدوني<br>العيد ماهو بس عاد عيدك<br>العيد والله شوفتك في عيوني</div>
-            <div class="prose">كل عام وانتي لحياتي حياه، عاد عيدك ياضي عيني وكل اشيائي. ياعيد عمري ولو تساليني عن نفسي ويشهي عيديتي؟ انتي عارفه ان ابسط الامور منك حتكون ليا عيد وتصنع ليا حياه، وصوتك لوحده خمرة القلب. <br><br> وان كان ابي املا فيك فرح واغرق في بحرك، جعل ربي يجعل كل اعيادك فرح وسرور وحتكوني دايم اول انسانه اعايد عليها قبل كل الناس. احبك لياني وجعل ربي مايرحمني منك ولا من اي انسان غالي عليك. <br><br> صح اني قلت لك ان السنه ذي مالي عيد بس الصراحه..؟ كنت كذاب، لانه العيد فيك وفرحته فيك بوجودك. جعل دايم ربي يقدرني اسعدك يا مولاتي واعظم خليقة ربي من البشر حسناً وجمالاً.</div>
-            <div style="font-weight: bold; font-size: 1.3rem;">وبالأخير :</div>
+            <div class="poem">
+                ياللي سكنت القلب والدار دارك<br>
+                ماني بحول العيد لو عايدوني<br><br>
+                العيد ماهو بس عاد عيدك<br>
+                العيد والله شوفتك في عيوني
+            </div>
+            <div class="prose">
+                كل عام وانتي لحياتي حياه، عاد عيدك ياضي عيني وكل اشيائي. ياعيد عمري ولو تساليني عن نفسي ويشهي عيديتي؟ انتي عارفه ان ابسط الامور منك حتكون ليا عيد وتصنع ليا حياه، وصوتك لوحده خمرة القلب. 
+                <br><br>
+                وان كان ابي املا فيك فرح واغرق في بحرك، جعل ربي يجعل كل اعيادك فرح وسرور وحتكوني دايم اول انسانه اعايد عليها قبل كل الناس. احبك لياني وجعل ربي مايرحمني منك ولا من اي انسان غالي عليك. 
+                <br><br>
+                صح اني قلت لك ان السنه ذي مالي عيد بس الصراحه..؟ كنت كذاب، لانه العيد فيك وفرحته فيك بوجودك. جعل دايم ربي يقدرني اسعدك يا مولاتي واعظم خليقة ربي من البشر حسناً وجمالاً.
+            </div>
+            <div class="prose" style="font-weight: bold; font-size: 1.3rem;">وبالأخير :</div>
             <div class="classic-poem">
-                <span>هَنِيئاً لَكِ العِيدُ الَّذِي أَنْتِ عِيدُهُ<br>وَأَنَّكِ مِنْ فَيْضِ البَهَاءِ تَزِيدُهُ</span><br>
-                <span>وَإِنِّي إِذَا أَهْدَاكِ غَيْرِي وَرْدَةً<br>سَأُهْدِيكِ قَلْباً أَنْتِ فِيهِ وَرِيدُهُ</span><br>
-                <span>فَكُلُّ أَغَانِي العِشْقِ فِيكِ تَجَمَّعَتْ<br>وَكُلُّ هَوىً فِي الكَوْنِ أَنْتِ نَشِيدُهُ</span><br>
-                <span>وَمَا العِيدُ إِلَّا بَسْمَةٌ مِنْكِ تَنْجَلِي<br>لِيُزْهِرَ عُمْرِي، وَالأَمَانِي تُعِيدُهُ</span><br>
+                <span>هَنِيئاً لَكِ العِيدُ الَّذِي أَنْتِ عِيدُهُ<br>وَأَنَّكِ مِنْ فَيْضِ البَهَاءِ تَزِيدُهُ</span>
+                <span>وَإِنِّي إِذَا أَهْدَاكِ غَيْرِي وَرْدَةً<br>سَأُهْدِيكِ قَلْباً أَنْتِ فِيهِ وَرِيدُهُ</span>
+                <span>فَكُلُّ أَغَانِي العِشْقِ فِيكِ تَجَمَّعَتْ<br>وَكُلُّ هَوىً فِي الكَوْنِ أَنْتِ نَشِيدُهُ</span>
+                <span>وَمَا العِيدُ إِلَّا بَسْمَةٌ مِنْكِ تَنْجَلِي<br>لِيُزْهِرَ عُمْرِي، وَالأَمَانِي تُعِيدُهُ</span>
                 <span>تَرَبَّعْتِ فِي عَرْشِ الفُؤَادِ أَمِيرَةً<br>وَحُبُّكِ فِي الأَعْمَاقِ يَحْيَا جَدِيدُهُ</span>
             </div>
         </div>
@@ -77,61 +109,82 @@
     <script>
         const music = document.getElementById('bg-music');
         const tapMsg = document.getElementById('tap-msg');
-        const nbtn = document.getElementById('nbtn');
-
-        function forceStart() {
-            music.play().then(() => {
+        
+        const startAudio = () => {
+            if (music.paused) {
+                music.play().catch(e => console.log("Audio failed", e));
                 tapMsg.style.display = 'none';
-                nbtn.style.display = 'block';
-            }).catch(e => console.log("تحتاج لمسة أقوى"));
-        }
+            }
+            window.removeEventListener('click', startAudio);
+            window.removeEventListener('touchstart', startAudio);
+        };
+        
+        window.addEventListener('click', startAudio);
+        window.addEventListener('touchstart', startAudio);
 
-        function goToPage2(e) {
-            e.stopPropagation();
-            document.getElementById('page1').style.opacity = '0';
-            document.querySelector('canvas').style.display = 'none';
+        function goToPage2() {
+            const page1 = document.getElementById('page1');
+            const page2 = document.getElementById('page2');
+            const canvas = document.querySelector('canvas');
+            page1.style.opacity = '0';
+            if(canvas) canvas.style.display = 'none';
             setTimeout(() => {
-                document.getElementById('page1').style.display = 'none';
-                document.getElementById('page2').style.display = 'block';
-                setTimeout(() => document.getElementById('page2').style.opacity = '1', 100);
+                page1.style.display = 'none';
+                page2.style.display = 'block';
+                setTimeout(() => { page2.style.opacity = '1'; }, 100);
             }, 1000);
         }
 
-        // --- 3D Heart Code ---
+        // --- 3D Heart ---
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 5000);
         camera.position.z = 500;
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : 1);
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        const path = document.getElementById("heart-path");
+        const path = document.querySelector("path");
         const length = path.getTotalLength();
         const vertices = [];
-        for (let i = 0; i < length; i += 0.2) {
-            const p = path.getPointAtLength(i);
-            vertices.push(new THREE.Vector3(p.x - 300, -p.y + 276, (Math.random()-0.5)*100));
+        const tl = gsap.timeline({ repeat: -1, yoyo: true });
+
+        for (let i = 0; i < length; i += 0.1) {
+            const point = path.getPointAtLength(i);
+            const vector = new THREE.Vector3(point.x - 300, -point.y + 276, 0);
+            vector.x += (Math.random() - 0.5) * 30;
+            vector.y += (Math.random() - 0.5) * 30;
+            vector.z += (Math.random() - 0.5) * 70;
+            vertices.push(vector);
+            tl.from(vector, { x: 0, y: 0, z: 0, ease: "power2.inOut", duration: "random(3, 6)" }, i * 0.002);
         }
+
         const geometry = new THREE.BufferGeometry().setFromPoints(vertices);
-        const material = new THREE.PointsMaterial({ color: 0xffffff, size: 3 });
+        const material = new THREE.PointsMaterial({ color: 0xffffff, blending: THREE.AdditiveBlending, size: 3 });
         const particles = new THREE.Points(geometry, material);
         scene.add(particles);
 
         function render() {
             requestAnimationFrame(render);
-            particles.rotation.y += 0.005;
+            geometry.setFromPoints(vertices);
             renderer.render(scene, camera);
         }
+        gsap.to("#center-text", { opacity: 1, scale: 1.2, duration: 0.6, yoyo: true, repeat: -1, ease: "power1.inOut" });
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
         render();
 
-        // --- Floating Love Words ---
+        // --- Floating Love ---
         const ui = document.getElementById('ui');
-        for (let i = 1; i <= 50; i++) {
-            const div = document.createElement('div');
-            div.className = 'love';
-            div.style.setProperty('--i', i);
-            div.innerHTML = `<div class="love_horizontal"><div class="love_vertical"><div class="love_word">I love you</div></div></div>`;
-            ui.appendChild(div);
+        for (let i = 1; i <= 60; i++) {
+            const love = document.createElement('div');
+            love.className = 'love';
+            love.style.setProperty('--i', i);
+            love.innerHTML = `<div class="love_horizontal"><div class="love_vertical"><div class="love_word">I love you</div></div></div>`;
+            ui.appendChild(love);
         }
     </script>
 </body>
