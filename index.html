@@ -10,7 +10,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
         body { margin: 0; overflow: hidden; background: black; font-family: 'Tajawal', sans-serif; cursor: pointer; }
-        
+
+        /* -- شاشة البداية لتشغيل الصوت -- */
         #start-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: black; z-index: 2000; display: flex; justify-content: center; align-items: center;
@@ -18,9 +19,9 @@
         .start-btn {
             padding: 15px 40px; border: 2px solid #ea80b0; background: transparent;
             color: white; border-radius: 30px; font-size: 20px; cursor: pointer;
-            box-shadow: 0 0 20px #ea80b0; transition: 0.3s; font-family: 'Tajawal', sans-serif;
+            box-shadow: 0 0 20px #ea80b0; font-family: 'Tajawal', sans-serif;
         }
-
+        
         /* -- الصفحة الأولى (القلب) -- */
         #page1 { position: absolute; width: 100%; height: 100%; z-index: 2; transition: opacity 1s; }
         #page1 svg { position: absolute; width: 0; height: 0; }
@@ -29,11 +30,6 @@
             color: #fefbfb; font-size: 35px; font-weight: bold;
             text-shadow: 0 0 30px #faf6f8, 0 0 60px #fcfafb; opacity: 0; pointer-events: none; white-space: nowrap;
         }
-        #tap-msg {
-            position: absolute; bottom: 100px; width: 100%; text-align: center;
-            color: rgba(255, 255, 255, 0.5); font-size: 14px; animation: pulse 2s infinite; pointer-events: none; z-index: 5;
-        }
-        @keyframes pulse { 0% { opacity: 0.3; } 50% { opacity: 0.8; } 100% { opacity: 0.3; } }
         .next-btn {
             position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
             padding: 10px 25px; background: transparent; color: white; border: 2px solid white;
@@ -90,9 +86,8 @@
             <path d="M300,520 C-180,200 150,-120 300,130 C450,-120 780,200 300,520 Z" fill="none" stroke="none" />
         </svg>
         <div id="center-text">كل عام وانتي بخير</div>
-        <div id="tap-msg" style="display: none;">اضغط على الشاشة</div>
         <button class="next-btn" onclick="goToPage2()">الصفحة التالية 🤍</button>
-        </div> 
+    </div> 
 
     <div id="page2">
         <div id="ui"></div>
@@ -122,21 +117,12 @@
     </div> 
 
     <script>
-        // تشغيل الصوت
-        const music = document.getElementById('bg-music');
-        const tapMsg = document.getElementById('tap-msg');
-        
-        const startAudio = () => {
-            if (music.paused) {
-                music.play().catch(e => console.log("Audio play failed", e));
-            }
+        // تشغيل الصوت فقط عند ضغط الزر
+        function startAudio() {
+            const music = document.getElementById('bg-music');
+            music.play();
             document.getElementById('start-overlay').style.display = 'none';
-            window.removeEventListener('click', startAudio);
-            window.removeEventListener('touchstart', startAudio);
-        };
-        
-        window.addEventListener('click', startAudio);
-        window.addEventListener('touchstart', startAudio); 
+        }
 
         // التنقل بين الصفحات (إخفاء الأولى وإظهار الثانية)
         function goToPage2() {
@@ -166,7 +152,7 @@
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : 1);
         renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement); // تم إضافته لـ body عشان يكون ورا كل شيء 
+        document.body.appendChild(renderer.domElement); 
 
         const controlsWebGL = new THREE.OrbitControls(camera, renderer.domElement);
         controlsWebGL.enableZoom = false; 
